@@ -1,0 +1,72 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+#panchangData {
+  display: none; /* Initially hidden */
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto auto;
+  width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  background-size: cover;
+      background-repeat: no-repeat;
+  row-gap: 20px;
+  column-gap: 20px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+img {
+  width: 100px;
+  height: auto;
+}
+
+#trustDetails {
+  display: grid;
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
+  height: 200px;
+}
+
+#trustDetails,
+#headerSection,
+#sunriseMoonriseSection,
+#corePanchangSection,
+#auspiciousSection,
+#inauspiciousSection {
+  justify-content: center;
+  align-items: center;
+}
+
+.dpTableRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.dpTableKey {
+  font-weight: bold;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}

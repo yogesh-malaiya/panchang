@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panchang Fetcher</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    img{
+width:100px;
+height:auto;
+}
+    a {
+      text-decoration: none;
+      color: inherit;
+      /* Inherit the color from the parent element */
+    }
+    u{
+      text-decoration: none;
+    }
+    .text-formatting-toolbar {
+            display: none;
+            position: absolute;
+            padding: 5px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            z-index: 9999;
+        }
+
+        .text-formatting-toolbar button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .text-formatting-toolbar input[type="color"] {
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            border: none;
+            cursor: pointer;
+        }
+        .toolbar {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+  </style>
+</head>
+
+<body contenteditable="true">
+  <h1>Panchang Data</h1>
+  <button id="fetchPanchangBtn">Fetch Panchang</button>
+
+  <div id="spinner" style="display: none;">Loading...</div>
+  <div class="toolbar"></div>
+    <input type="file" id="bgImageInput" accept="image/*">
+    <button id="downloadBtn">Download Panchang as Image</button>
+  </div>
+  <div id="panchangData" style="display: none;">
+    <div id="trustDetails">
+      <div id="Name-logo">
+          <img id="Logo" src="MPDRST-Logo.png" alt="logo">
+          <h3 id="trustName">माँ पराशक्ति धर्म रहस्य सेवा ट्रस्ट</h3>
+          <p id="founder">संस्थापक: गुरुजी श्री सूरज प्रतापजी</p>
+      </div>
+      <div id="donation">
+          <img src="mpdrstQR.jpg" alt="QRCODE">
+      </div>
+  </div>
+    <div id="headerSection"></div>
+    <div id="sunriseMoonriseSection"></div>
+    <div id="corePanchangSection"></div>
+    <div id="auspiciousSection"></div>
+    <div id="inauspiciousSection"></div>
+  </div>
+  <div class="text-formatting-toolbar">
+    <input type="color" id="colorPicker" />
+    <button id="boldBtn">Bold</button>
+    <button id="increaseFontBtn">A+</button>
+    <button id="decreaseFontBtn">A-</button>
+</div>
+  <script src="/script.js"></script>
+  <script>
+    const textFormattingToolbar = document.querySelector('.text-formatting-toolbar');
+    const colorPicker = document.getElementById('colorPicker');
+    const boldBtn = document.getElementById('boldBtn');
+    const increaseFontBtn = document.getElementById('increaseFontBtn');
+    const decreaseFontBtn = document.getElementById('decreaseFontBtn');
+    
+    let userSelection;
+
+    // Function to change the color of selected text
+    function changeTextColor(color) {
+        if (userSelection && userSelection.rangeCount > 0) {
+            document.execCommand('foreColor', false, color);
+        }
+    }
+
+    // Function to toggle bold on selected text
+    function toggleBold() {
+        if (userSelection && userSelection.rangeCount > 0) {
+            document.execCommand('bold');
+        }
+    }
+
+    // Function to increase or decrease font size
+    function adjustFontSize(increase = true) {
+        if (userSelection && userSelection.rangeCount > 0) {
+            let currentSize = window.getComputedStyle(userSelection.anchorNode.parentElement).fontSize;
+            let newSize = parseFloat(currentSize) + (increase ? 2 : -2); // Increase or decrease font size
+            document.execCommand('fontSize', false, 7); // Use execCommand with 'fontSize' to apply
+            const fontElements = document.querySelectorAll('font[size="7"]'); // Find all <font> elements with size="7"
+            fontElements.forEach(font => font.removeAttribute('size')); // Remove the size attribute
+            fontElements.forEach(font => font.style.fontSize = `${newSize}px`); // Apply new font size
+        }
+    }
+
+    // Event listeners for buttons
+    colorPicker.addEventListener('input', (e) => {
+        changeTextColor(e.target.value);
+        textFormattingToolbar.style.display = 'block'; // Keep the toolbar visible
+    });
+
+    boldBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleBold();
+        textFormattingToolbar.style.display = 'block'; // Keep the toolbar visible
+    });
+
+    increaseFontBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        adjustFontSize(true); // Increase font size
+        textFormattingToolbar.style.display = 'block'; // Keep the toolbar visible
+    });
+
+    decreaseFontBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        adjustFontSize(false); // Decrease font size
+        textFormattingToolbar.style.display = 'block'; // Keep the toolbar visible
+    });
+
+    // Event listener for selection change
+    document.addEventListener('selectionchange', () => {
+        userSelection = window.getSelection();
+        if (userSelection && userSelection.toString().length > 0) {
+            const range = userSelection.getRangeAt(0);
+            const selectionRect = range.getBoundingClientRect();
+            
+            // Show toolbar near selected text
+            textFormattingToolbar.style.top = `${selectionRect.bottom + window.scrollY + 10}px`;
+            textFormattingToolbar.style.left = `${selectionRect.left + window.scrollX}px`;
+            textFormattingToolbar.style.display = 'block';
+        } else {
+            textFormattingToolbar.style.display = 'none';
+        }
+    });
+
+    // Prevent losing the selection when clicking buttons
+    textFormattingToolbar.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Prevent default action that might lose selection
+    });
+
+</script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    const panchangDataDiv = document.getElementById('panchangData');
+    const bgImageInput = document.getElementById('bgImageInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    // Set the background image for panchangData
+    bgImageInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          panchangDataDiv.style.backgroundImage = `url(${e.target.result})`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Download #panchangData content as an image
+    downloadBtn.addEventListener('click', () => {
+      html2canvas(panchangDataDiv).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'panchang.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    });
+    </script>
+</body>
+
+</html>
