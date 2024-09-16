@@ -5,9 +5,21 @@ document.getElementById('fetchPanchangBtn').addEventListener('click', async () =
   // Show spinner and hide data container
   spinner.style.display = 'block';
   panchangDataDiv.style.display = 'none'; // Ensure it's hidden while fetching
-
+  
   try {
-    const response = await fetch('/fetch-panchang');
+    // Fetch user's location using the geolocation API
+    const geonameId = await getUserGeonameId(); // Fetch the geonameId from user's location
+    
+    if (!geonameId) {
+      panchangDataDiv.innerHTML = 'Could not determine your location.';
+      spinner.style.display = 'none';
+      panchangDataDiv.style.display = 'block';
+      return;
+    }
+
+    // Fetch Panchang data using geoname-id
+    const response = await fetch(`/fetch-panchang?geoname-id=${geonameId}`);
+    
     if (response.ok) {
       const data = await response.json();
 
@@ -33,3 +45,43 @@ document.getElementById('fetchPanchangBtn').addEventListener('click', async () =
     console.error('Error:', error);
   }
 });
+
+// Function to get user's geonameId based on current location
+async function getUserGeonameId() {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        try {
+          const geonameId = await fetchGeoNameId(lat, lon); // Fetch GeoName ID
+          resolve(geonameId);
+        } catch (error) {
+          console.error('Error fetching GeoNames data:', error);
+          resolve(null); // Return null in case of error
+        }
+      }, (error) => {
+        console.error('Geolocation error:', error);
+        resolve(null); // Return null if geolocation fails
+      });
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+      resolve(null);
+    }
+  });
+}
+
+// Fetch GeoNames ID using latitude and longitude
+async function fetchGeoNameId(lat, lon) {
+  const username = 'yogeshmalaiya'; // Your GeoNames username
+  const url = `http://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lon}&cities=cities1000&maxRows=1&username=${username}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+  
+  if (data.geonames && data.geonames.length > 0) {
+    return data.geonames[0].geonameId;
+  } else {
+    throw new Error("No main city found for the given location");
+  }
+}

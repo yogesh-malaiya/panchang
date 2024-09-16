@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Function to fetch data from DrikPanchang
+// Function to fetch data from DrikPanchang with geoname-id
 async function fetchDataFromDrikPanchang(url) {
   try {
     const response = await axios.get(url);
@@ -26,10 +26,16 @@ async function fetchDataFromDrikPanchang(url) {
   }
 }
 
-// Fetch Panchang route
+// Fetch Panchang route with geoname-id parameter
 app.get('/fetch-panchang', async (req, res) => {
+  const geonameId = req.query['geoname-id'];  // Get geoname-id from query
+
+  if (!geonameId) {
+    return res.status(400).send('Missing geoname-id parameter');
+  }
+
   try {
-    const url = 'https://www.drikpanchang.com/panchang/day-panchang.html?lang=hi';
+    const url = `https://www.drikpanchang.com/panchang/day-panchang.html?lang=hi&geoname-id=${geonameId}`;
     const htmlData = await fetchDataFromDrikPanchang(url);
 
     if (!htmlData) {
