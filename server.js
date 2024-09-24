@@ -28,7 +28,7 @@ async function fetchDataFromDrikPanchang(url) {
 
 // Fetch Panchang route with geoname-id parameter
 app.get('/fetch-panchang', async (req, res) => {
-  const geonameId = req.query['geoname-id'];  // Get geoname-id from query
+  const geonameId = req.query['geoname-id']; // Get geoname-id from query
 
   if (!geonameId) {
     return res.status(400).send('Missing geoname-id parameter');
@@ -73,6 +73,21 @@ app.get('/fetch-panchang', async (req, res) => {
   } catch (error) {
     console.error('Error in /fetch-panchang route:', error);
     res.status(500).send('Internal Server Error');
+  }
+});
+
+// Fetch GeoNames data through your server
+app.get('/fetch-geoname', async (req, res) => {
+  const { lat, lng } = req.query;
+  const username = 'yogeshmalaiya'; // Your GeoNames username
+  const url = `http://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lng}&cities=cities1000&maxRows=1&username=${username}`;
+
+  try {
+    const response = await axios.get(url);
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching GeoName data:', error);
+    res.status(500).send('Error fetching GeoName data');
   }
 });
 

@@ -5,11 +5,11 @@ document.getElementById('fetchPanchangBtn').addEventListener('click', async () =
   // Show spinner and hide data container
   spinner.style.display = 'block';
   panchangDataDiv.style.display = 'none'; // Ensure it's hidden while fetching
-  
+
   try {
     // Fetch user's location using the geolocation API
     const geonameId = await getUserGeonameId(); // Fetch the geonameId from user's location
-    
+
     if (!geonameId) {
       panchangDataDiv.innerHTML = 'Could not determine your location.';
       spinner.style.display = 'none';
@@ -19,7 +19,7 @@ document.getElementById('fetchPanchangBtn').addEventListener('click', async () =
 
     // Fetch Panchang data using geoname-id
     const response = await fetch(`/fetch-panchang?geoname-id=${geonameId}`);
-    
+
     if (response.ok) {
       const data = await response.json();
 
@@ -52,7 +52,7 @@ async function getUserGeonameId() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const lat = position.coords.latitude;
-        const lng = position.coords.longitude; // Changed 'lon' to 'lng'
+        const lng = position.coords.longitude; // Corrected variable name
         try {
           const geonameId = await fetchGeoNameId(lat, lng); // Fetch GeoName ID
           resolve(geonameId);
@@ -73,12 +73,9 @@ async function getUserGeonameId() {
 
 // Fetch GeoNames ID using latitude and longitude
 async function fetchGeoNameId(lat, lng) {
-  const username = 'yogeshmalaiya'; // Your GeoNames username
-  const url = `https://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lng}&cities=cities1000&maxRows=1&username=${username}`;
-
-  const response = await fetch(url);
+  const response = await fetch(`/fetch-geoname?lat=${lat}&lng=${lng}`);
   const data = await response.json();
-  
+
   if (data.geonames && data.geonames.length > 0) {
     return data.geonames[0].geonameId;
   } else {
