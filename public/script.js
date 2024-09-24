@@ -74,7 +74,7 @@ async function getUserGeonameId() {
 // Fetch GeoNames ID using latitude and longitude
 async function fetchGeoNameId(lat, lon) {
   const username = 'yogeshmalaiya'; // Your GeoNames username
-  const url = `http://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lon}&cities=cities1000&maxRows=1&username=${username}`;
+  const url = `https://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lng}&cities=cities1000&maxRows=1&username=${username}`;
 
   const response = await fetch(url);
   const data = await response.json();
