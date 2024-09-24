@@ -52,9 +52,9 @@ async function getUserGeonameId() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+        const lng = position.coords.longitude; // Changed 'lon' to 'lng'
         try {
-          const geonameId = await fetchGeoNameId(lat, lon); // Fetch GeoName ID
+          const geonameId = await fetchGeoNameId(lat, lng); // Fetch GeoName ID
           resolve(geonameId);
         } catch (error) {
           console.error('Error fetching GeoNames data:', error);
@@ -72,7 +72,7 @@ async function getUserGeonameId() {
 }
 
 // Fetch GeoNames ID using latitude and longitude
-async function fetchGeoNameId(lat, lon) {
+async function fetchGeoNameId(lat, lng) {
   const username = 'yogeshmalaiya'; // Your GeoNames username
   const url = `https://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lng}&cities=cities1000&maxRows=1&username=${username}`;
 
